@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -67,17 +67,72 @@ const publishAVideo = asyncHandler(async (req, res) => {
 });
 
 
-
 const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: get video by id
-})
+    //TODO: get video by id is complete 
+    const { videoId } = req.params;
+
+    if (!videoId) {
+        throw new ApiError(400, "Video ID is required");
+    }
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+    res.status(200).json(new ApiResponse(200, video, "Video found successfully"));
+});
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { videoId } = req.params;
 
-})
+    if (!videoId) {
+        throw new ApiError(400, "Video ID is required");
+    }
+
+    const { title, description } = req.body;
+    const thumbnailLocalPath = req.file?.path;
+
+    if (!thumbnailLocalPath) {
+        throw new ApiError(400, "Thumbnail file is missing");
+    }
+
+    let updatedthumbnail;
+    try {
+        updatedthumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+        if (!updatedthumbnail.secure_url) {
+            throw new Error("Error while uploading updated Thumbnail");
+        }
+
+        const oldThumbnailUrl = req.user?.thumbnail;
+        if (oldThumbnailUrl) {
+            const publicId = oldThumbnailUrl.split('/').pop().split('.')[0];
+            await deleteFromCloudinary(publicId);
+        }
+    } catch (error) {
+        throw new ApiError(400, "Error occurred during thumbnail upload or deletion from Cloudinary");
+    }
+
+    const updatedFields = {};
+    if (title) {
+        updatedFields.title = title;
+    }
+    if (description) {
+        updatedFields.description = description;
+    }
+    if (updatedthumbnail && updatedthumbnail.secure_url) {
+        updatedFields.thumbnail = updatedthumbnail.secure_url;
+    }
+
+    const updatedVideo = await Video.findByIdAndUpdate(videoId, updatedFields, { new: true });
+
+    if (!updatedVideo) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, updatedVideo, "Video updated successfully"));
+});
+
+
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
