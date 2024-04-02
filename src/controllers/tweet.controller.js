@@ -42,7 +42,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 });
 
 const updateTweet = asyncHandler(async (req, res) => {
-    //TODO: update tweet
+     //TODO: update tweet
     const { tweetId } = req.params;
     const { content } = req.body;
 
@@ -55,20 +55,19 @@ const updateTweet = asyncHandler(async (req, res) => {
     }
 
     try {
-        const tweet = await Tweet.findById(tweetId);
-        
-        if (!tweet) {
+        var updatedTweet = await Tweet.findOneAndUpdate(
+            { _id: tweetId }, 
+            { content: content }, 
+            { new: true } 
+        );
+
+        if (!updatedTweet) {
             throw new ApiError(404, "Tweet not found");
         }
-
-        tweet.content = content;
-
-        const updatedTweet = await tweet.save();
-
+        
     } catch (error) {
         throw new ApiError(500, "Error updating tweet");
     }
-    
     res.status(200).json(new ApiResponse(200, updatedTweet, "Tweet updated successfully"));
 
 });
@@ -76,7 +75,27 @@ const updateTweet = asyncHandler(async (req, res) => {
 
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
-})
+    const { tweetId } = req.params;
+
+    if (!tweetId) {
+        throw new ApiError(400, "Tweet ID is required");
+    }
+
+    try {
+        const tweet = await Tweet.findByIdAndDelete(tweetId);
+
+        if (!tweet) {
+            throw new ApiError(404, "Tweet not found");
+        }
+
+    } catch (error) {
+        throw new ApiError(500, "Error deleting tweet");
+    }
+
+    res.status(200).json(new ApiResponse(200, {}, "Tweet deleted successfully"));
+});
+
+
 
 export {
     createTweet,
