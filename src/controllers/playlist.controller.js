@@ -5,11 +5,34 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 
-const createPlaylist = asyncHandler(async (req, res) => {
-    const {name, description} = req.body
+// const createPlaylist = asyncHandler(async (req, res) => {
+//     const {name, description} = req.body
 
-    //TODO: create playlist
-})
+//     //TODO: create playlist
+// })
+
+const createPlaylist = asyncHandler(async (req, res) => {
+    const { name, description } = req.body;
+
+    if (!name || !description) {
+        throw new ApiError(400, "Playlist name and description are required");
+    }
+
+    try {
+        var playlistObject = await Playlist.create({
+            name,
+            description,
+            videos: [], // Initialize videos array with an empty array
+            owner: req.user._id 
+        });
+
+    } catch (error) {
+        throw new ApiError(500, "Error creating playlist");
+    }
+    res.status(201).json(new ApiResponse(200, playlistObject, "Playlist created successfully"));
+
+});
+
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
