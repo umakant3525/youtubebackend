@@ -96,13 +96,8 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     }
 });
 
-
-// const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
-//     const {playlistId, videoId} = req.params
-//     // TODO: remove video from playlist
-
-// })
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+    // TODO: remove video from playlist
     const { videoId, playlistId } = req.params;
 
     const isVideoExist = await Video.findById(videoId);
