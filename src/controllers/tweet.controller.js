@@ -11,7 +11,7 @@ const createTweet = asyncHandler(async (req, res) => {
  //TODO: create tweet
 
     if (!content) {
-        throw new ApiError(400, "Something comment content is required is required field are required");
+        throw new ApiError(400, "Something comment is  required");
     }
 
     const tweetObject = await Tweet.create({
@@ -41,10 +41,38 @@ const getUserTweets = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, userTweets, "User tweets retrieved successfully"));
 });
 
-
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
-})
+    const { tweetId } = req.params;
+    const { content } = req.body;
+
+    if (!tweetId) {
+        throw new ApiError(400, "Tweet ID is required");
+    }
+
+    if (!content) {
+        throw new ApiError(400, "Content is required");
+    }
+
+    try {
+        const tweet = await Tweet.findById(tweetId);
+        
+        if (!tweet) {
+            throw new ApiError(404, "Tweet not found");
+        }
+
+        tweet.content = content;
+
+        const updatedTweet = await tweet.save();
+
+    } catch (error) {
+        throw new ApiError(500, "Error updating tweet");
+    }
+    
+    res.status(200).json(new ApiResponse(200, updatedTweet, "Tweet updated successfully"));
+
+});
+
 
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
