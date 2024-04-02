@@ -185,10 +185,10 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
 export {
     createPlaylist,
-    getUserPlaylists,
     getPlaylistById,
+    updatePlaylist,
+    deletePlaylist,
     addVideoToPlaylist,
     removeVideoFromPlaylist,
-    deletePlaylist,
-    updatePlaylist
+    getUserPlaylists,
 }
