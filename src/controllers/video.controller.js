@@ -6,12 +6,24 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 
+//this is an  task for me 
+// const getAllVideos = asyncHandler(async (req, res) => {
+//     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+//     //TODO: get all videos based on query, sort, pagination
+// })
 
+//this is an temperary my mathod for get all vides but sir task is get all videos with some  queries and sorting
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
-})
-
+    try {
+        const allVideos = await Video.find();
+        if (!allVideos || allVideos.length === 0) {
+            throw new ApiError(404, "No videos found");
+        }
+        res.status(200).json(new ApiResponse(200, allVideos, "All videos found successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Error fetching videos");
+    }
+});
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body;
