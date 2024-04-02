@@ -4,14 +4,8 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
-
-// const createPlaylist = asyncHandler(async (req, res) => {
-//     const {name, description} = req.body
-
-//     //TODO: create playlist
-// })
-
 const createPlaylist = asyncHandler(async (req, res) => {
+     //TODO: create playlist
     const { name, description } = req.body;
 
     if (!name || !description) {
@@ -33,11 +27,22 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 });
 
-
 const getUserPlaylists = asyncHandler(async (req, res) => {
-    const {userId} = req.params
-    //TODO: get user playlists
-})
+    // TODO : get user playlists
+    const { userId } = req.params;
+
+    if (!userId) {
+        throw new ApiError(400, "User ID is required");
+    }
+
+    const userPlaylists = await Playlist.find({ owner: userId });
+
+    if (!userPlaylists || userPlaylists.length === 0) {
+        throw new ApiError(404, "User playlists not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, userPlaylists, "User playlists retrieved successfully"));
+});
 
 const getPlaylistById = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
