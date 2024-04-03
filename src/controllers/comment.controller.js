@@ -67,11 +67,9 @@ const updateComment = asyncHandler(async (req, res) => {
     }
 });
 
-// const deleteComment = asyncHandler(async (req, res) => {
-//     // TODO: delete a comment
-// })
 
 const deleteComment = asyncHandler(async (req, res) => {
+    // TODO: delete a comment
     const { commentId } = req.params;
 
     if (!commentId) {
@@ -87,7 +85,7 @@ const deleteComment = asyncHandler(async (req, res) => {
     // if (commentToDelete.owner.toString() !== req.user._id.toString()) {
     //     throw new ApiError(403, "You don't have permission to delete this comment");
     // }
-    
+
     const deletedComment = await Comment.findByIdAndDelete(commentId);
 
     if (!deletedComment) {
