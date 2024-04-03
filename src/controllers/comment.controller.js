@@ -12,7 +12,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-     // TODO: add a comment
+    // TODO: add a comment
     const { videoId } = req.params;
     const { content } = req.body;
 
@@ -51,9 +51,9 @@ const updateComment = asyncHandler(async (req, res) => {
 
     try {
         const updatedComment = await Comment.findOneAndUpdate(
-            { _id: commentId, owner: req.user._id }, 
-            { content: content }, 
-            { new: true } 
+            { _id: commentId, owner: req.user._id },
+            { content: content },
+            { new: true }
         );
 
         if (!updatedComment) {
@@ -67,9 +67,39 @@ const updateComment = asyncHandler(async (req, res) => {
     }
 });
 
+// const deleteComment = asyncHandler(async (req, res) => {
+//     // TODO: delete a comment
+// })
+
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
-})
+    const { commentId } = req.params;
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment ID is required");
+    }
+
+    const commentToDelete = await Comment.findOne({ _id: commentId });
+
+    if (!commentToDelete) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    // if (commentToDelete.owner.toString() !== req.user._id.toString()) {
+    //     throw new ApiError(403, "You don't have permission to delete this comment");
+    // }
+    
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+    if (!deletedComment) {
+        throw new ApiError(500, "Error deleting comment");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Comment deleted successfully")
+    );
+});
+
+
 
 export {
     getVideoComments,
