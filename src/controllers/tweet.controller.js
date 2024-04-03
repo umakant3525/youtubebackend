@@ -11,7 +11,7 @@ const createTweet = asyncHandler(async (req, res) => {
  //TODO: create tweet
 
     if (!content) {
-        throw new ApiError(400, "Something comment is  required");
+        throw new ApiError(400, "Something tweet is  required");
     }
 
     const tweetObject = await Tweet.create({
