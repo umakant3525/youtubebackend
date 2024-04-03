@@ -5,11 +5,30 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
-    const { videoId } = req.params
-    const { page = 1, limit = 10 } = req.query
+    // TODO: get all comments for a video
+    const { videoId } = req.params;
+    let { page = 1, limit = 10 } = req.query;
 
-})
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const comments = await Comment.find({ video: videoId })
+        .skip((page - 1) * limit) 
+        .limit(limit) 
+        .populate('owner', 'username')
+
+    if (!comments || comments.length === 0) {
+        return res.status(404).json(ApiError(404, 'Comments not found for the video'));
+    }
+
+    const totalComments = await Comment.countDocuments({ video: videoId });
+
+    return res.status(200).json(new ApiResponse(200, comments, "Comments fetched successfully", {
+        totalComments,
+        totalPages: Math.ceil(totalComments / limit),
+        currentPage: page
+    }));
+});
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment
