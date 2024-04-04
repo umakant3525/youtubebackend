@@ -64,7 +64,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 const getChannelVideos = asyncHandler(async (req, res) => {
      // TODO: Get all the videos uploaded by the channel
     const userId = req.user._id;
-
+    
     const videos = await Video.find({ owner: userId }, 'videoFile');
 
     if (!videos || videos.length === 0) {
