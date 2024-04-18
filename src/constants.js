@@ -1,1 +1,1 @@
-export const DB_NAME = "forkvideotube"
+export const DB_NAME = "database2"
